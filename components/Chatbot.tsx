@@ -27,6 +27,30 @@ export default function Chatbot() {
         }
     };
 
+    const handlePlaySpeech = async () => {
+        if (!response) return;
+
+        try {
+            const res = await fetch("/api/speech-test", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    input: response,
+                }),
+            });
+
+            const audioBlob = await res.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            const audio = new Audio(audioUrl);
+            audio.play();
+        } catch (error) {
+            console.error("Error playing speech:", error);
+        }
+    };
+
     return (
         <div className="p-4 max-w-md mx-auto bg-gray-100 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold">Chatbot</h2>
@@ -44,6 +68,20 @@ export default function Chatbot() {
                 {loading ? "Loading..." : "Send"}
             </button>
             {response && <p className="mt-3 p-2 bg-white border rounded">{response}</p>}
+            {response && (
+                <button
+                    onClick={handlePlaySpeech}
+                    style={{
+                        padding: "10px 20px",
+                        backgroundColor: "#007BFF",
+                        color: "white",
+                        border: "none",
+                        cursor: "pointer",
+                    }}
+                >
+                    Play Speech
+                </button>
+            )}
         </div>
     );
 }
